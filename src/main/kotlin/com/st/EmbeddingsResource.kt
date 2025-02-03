@@ -9,33 +9,35 @@ import org.eclipse.microprofile.reactive.messaging.Incoming
 import org.jboss.logging.Logger
 
 @Path("/embeddings")
-class EmbeddingsResource {
+class EmbeddingsResource(
+    private val embeddings: Embeddings
+) {
+
     @Channel("rss-embeddings")
     var emitter: Emitter<RssEmbeddings>? = null
 
     @POST
     fun enqueueRss(rss: Rss): Response {
         LOGGER.infof("Sending rss %s to Kafka", rss.title)
-        val rssEmbeddings = generateEmbeddings(rss)
+        val rssEmbeddings = convert(rss)
         emitter!!.send(rssEmbeddings)
         return Response.accepted().build()
     }
 
     @Incoming("rss-feed")
     fun rssFeed(rss: Rss){
-        //TODO: Generate embeddings
-        val rssEmbeddings = generateEmbeddings(rss)
+        val rssEmbeddings = convert(rss)
         emitter!!.send(rssEmbeddings)
     }
 
-    private fun generateEmbeddings(rss: Rss): RssEmbeddings {
+    private fun convert(rss: Rss): RssEmbeddings {
         val rssEmbeddings = RssEmbeddings.newBuilder()
             .setTitle(rss.title)
             .setDescription(rss.description)
             .setLink(rss.link)
             .setPubDate(rss.pubDate)
             .setCategory(rss.category)
-            .setEmbeddings(listOf(-0.1f,1.0f))
+            .setEmbeddings(embeddings.generate(rss))
             .build()
         return rssEmbeddings
     }
