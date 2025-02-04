@@ -6,9 +6,21 @@ import dev.langchain4j.model.embedding.EmbeddingModel
 import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
-class Embeddings(
+class EmbeddingsTool(
     private val embeddingModel: EmbeddingModel
 ) {
+
+    fun convert(rss: Rss): RssEmbeddings {
+        val rssEmbeddings = RssEmbeddings.newBuilder()
+            .setTitle(rss.title)
+            .setDescription(rss.description)
+            .setLink(rss.link)
+            .setPubDate(rss.pubDate)
+            .setCategory(rss.category)
+            .setEmbeddings(generate(rss))
+            .build()
+        return rssEmbeddings
+    }
 
     fun generate(rss: Rss): List<Float> {
         val metas: Map<String, String> = java.util.Map.of(

@@ -10,7 +10,7 @@ import org.jboss.logging.Logger
 
 @Path("/embeddings")
 class EmbeddingsResource(
-    private val embeddings: Embeddings
+    private val embeddingsTool: EmbeddingsTool
 ) {
 
     @Channel("rss-embeddings")
@@ -19,27 +19,15 @@ class EmbeddingsResource(
     @POST
     fun enqueueRss(rss: Rss): Response {
         LOGGER.infof("Sending rss %s to Kafka", rss.title)
-        val rssEmbeddings = convert(rss)
+        val rssEmbeddings = embeddingsTool.convert(rss)
         emitter!!.send(rssEmbeddings)
         return Response.accepted().build()
     }
 
     @Incoming("rss-feed")
     fun rssFeed(rss: Rss){
-        val rssEmbeddings = convert(rss)
+        val rssEmbeddings = embeddingsTool.convert(rss)
         emitter!!.send(rssEmbeddings)
-    }
-
-    private fun convert(rss: Rss): RssEmbeddings {
-        val rssEmbeddings = RssEmbeddings.newBuilder()
-            .setTitle(rss.title)
-            .setDescription(rss.description)
-            .setLink(rss.link)
-            .setPubDate(rss.pubDate)
-            .setCategory(rss.category)
-            .setEmbeddings(embeddings.generate(rss))
-            .build()
-        return rssEmbeddings
     }
 
     companion object {
