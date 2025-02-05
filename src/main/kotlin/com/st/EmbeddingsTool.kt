@@ -44,7 +44,8 @@ class EmbeddingsTool(
         val splitter: DocumentSplitter = DocumentByParagraphSplitter(800, 50)
 
         val segments = splitter.split(document)
-        LOGGER.infof("The document was split as %s chunks", segments.size)
+        if (segments.size > 1)
+            LOGGER.infof("The document was split as %s chunks", segments.size)
         val embeddings: List<Embedding> = embeddingModel.embedAll(segments).content()
         return embeddings.get(0).vectorAsList()
 //        val segment = TextSegment(rss.description, Metadata(metas))
