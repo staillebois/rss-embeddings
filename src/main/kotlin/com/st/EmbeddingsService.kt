@@ -5,7 +5,6 @@ import dev.langchain4j.data.document.DocumentSplitter
 import dev.langchain4j.data.document.Metadata
 import dev.langchain4j.data.document.splitter.DocumentByParagraphSplitter
 import dev.langchain4j.data.embedding.Embedding
-import dev.langchain4j.data.segment.TextSegment
 import dev.langchain4j.model.embedding.EmbeddingModel
 import jakarta.enterprise.context.ApplicationScoped
 import org.jboss.logging.Logger
@@ -13,7 +12,7 @@ import java.lang.String.join
 
 
 @ApplicationScoped
-class EmbeddingsTool(
+class EmbeddingsService(
     private val embeddingModel: EmbeddingModel
 ) {
 
@@ -53,6 +52,6 @@ class EmbeddingsTool(
     }
 
     companion object {
-        private val LOGGER: Logger = Logger.getLogger(EmbeddingsTool::class.java)
+        private val LOGGER: Logger = Logger.getLogger(EmbeddingsService::class.java)
     }
 }
